@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="chat-container">
+    <div class="chat-sidebar">
+        <div class="chat-header-small">
+            <h3>Daftar Kontak</h3>
+        </div>
+        <div class="chat-list-scroll">
+            {% for c in contacts %}
+            <a href="/messages/{{ c.id_user }}" class="contact-card {{ 'active' if rcv and rcv.id_user == c.id_user else '' }}">
+                <div class="avatar av-md" style="background-image: url('https://ui-avatars.com/api/?name={{ c.nama }}&background=random');"></div>
+                <div class="contact-info">
+                    <div class="c-name">{{ c.nama }}</div>
+                    <div class="c-role">@{{ c.username }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="chat-main">
+        {% if rcv %}
+        <div class="chat-top-bar">
+            <div class="avatar av-sm" style="background-image: url('https://ui-avatars.com/api/?name={{ rcv.nama }}&background=B8860B&color=fff');"></div>
+            <div class="active-user-info">
+                <b>{{ rcv.nama }}</b>
+                <span class="status-indicator">Warga Batavia</span>
+            </div>
+        </div>
+        
+        <div id="msgBox" class="msg-canvas" data-room="{{ [u.id_user, rcv.id_user]|sort|join('_') }}">
+            {% for m in msgs %}
+            <div class="msg-row {{ 'row-me' if m.sender_id == u.id_user else 'row-you' }}">
+                <div class="msg-bubble {{ 'bubble-me' if m.sender_id == u.id_user else 'bubble-you' }}">
+                    {{ m.message }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="chat-input-wrapper">
+            <div class="input-paper">
+                <input type="text" id="msgIn" placeholder="Tulis surat anda di sini..." autocomplete="off">
+                <button onclick="sendMsg({{ rcv.id_user }})">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fa-solid fa-feather-pointed"></i>
+            </div>
+            <h2>Korespondensi Batavia</h2>
+            <p>Pilih warga dari daftar kontak untuk memulai percakapan.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

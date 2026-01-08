@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if p == 'home' %}
+    <div class="card">
+        <form id="postForm" style="display: flex; gap: 15px">
+            <div class="avatar av-md" style="background-image: url('https://ui-avatars.com/api/?name={{ u.nama }}&background=B8860B&color=fff');"></div>
+            <div style="flex: 1;">
+                <textarea name="caption" rows="2" placeholder="{{ t.post_ph }}" class="clean-area"></textarea>
+                <div class="form-tools">
+                    <label for="fIn"><i class="fa-regular fa-image"></i> Photo</label>
+                    <input type="file" id="fIn" name="file" hidden>
+                    <button type="submit" class="btn-heritage">{{ t.post_btn }}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% for post in posts %}
+    <div class="card">
+        <div class="post-head">
+            <a href="/profile/{{ post.id_user }}" class="avatar av-sm" style="background-image: url('https://ui-avatars.com/api/?name={{ post.nama }}&background=random');"></a>
+            <div>
+                <a href="/profile/{{ post.id_user }}" style="font-weight: bold;">{{ post.username }} {% if post.role=='admin' %}<i class="fa-solid fa-certificate gold-icon"></i>{% endif %}</a>
+                <small style="display: block;">{{ post.created_at }}</small>
+            </div>
+        </div>
+        <p class="post-body">{{ post.caption }}</p>
+        {% if post.file %}<div class="post-img" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) }}');"></div>{% endif %}
+        <div class="post-acts">
+            <i onclick="doAct('like', {{ post.id_postingan | tojson }})" class="{% if post.is_liked %}fa-solid liked{% else %}fa-regular{% endif %} fa-heart"></i>
+            <span>{{ post.likes }}</span>
+        </div>
+    </div>
+    {% endfor %}
+
+{% elif p == 'explore' %}
+    <h2>{{ t.news }}</h2>
+    <div class="news-ticker">
+        {% for n in news %}
+        <div class="news-card" onclick="window.open('{{ n.file }}', '_blank')">
+            <div class="news-tag">RESMI</div>
+            <h3>{{ n.caption }}</h3>
+            <small>Baca Selengkapnya &rarr;</small>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2>Galeri Batavia</h2>
+    <div class="grid-gallery">
+        {% for post in posts %}
+        <a href="/profile/{{ post.id_user }}" class="grid-item" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) if post.file else '' }}');">
+            {% if not post.file %}<div class="txt-only">{{ post.caption }}</div>{% endif %}
+        </a>
+        {% endfor %}
+    </div>
+
+{% elif p == 'profile' %}
+    <div class="card profile-card">
+        <div class="avatar av-lg" style="background-image: url('https://ui-avatars.com/api/?name={{ target.nama }}&background=B8860B&color=fff');"></div>
+        <h1>{{ target.nama }}</h1>
+        <p>@{{ target.username }}</p>
+        <p class="bio">"{{ target.bio or 'Warga kehormatan Batavia.' }}"</p>
+        
+        <div class="stats-row">
+            <div><b>{{ stats.post }}</b> <small>Kiriman</small></div>
+            <div><b>{{ stats.follower }}</b> <small>Pengikut</small></div>
+            <div><b>{{ stats.following }}</b> <small>Mengikuti</small></div>
+        </div>
+
+        {% if me %}
+        <button onclick="document.getElementById('editModal').classList.add('active')" class="btn-heritage inv">{{ t.edit }}</button>
+        {% elif not following %}
+        <button onclick="doAct('follow', {{ target.id_user }})" class="btn-heritage">{{ t.follow }}</button>
+        {% else %}
+        <button class="btn-heritage inv">Mengikuti</button>
+        <button onclick="window.location.href='/messages/{{ target.id_user }}'" class="btn-heritage inv">Kirim Surat</button>
+        {% endif %}
+    </div>
+
+    <div class="grid-gallery">
+        {% for post in posts %}
+        <div class="grid-item" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) if post.file else '' }}');"></div>
+        {% endfor %}
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-box">
+            <h2>Ubah Data</h2>
+            <form id="editForm">
+                <input type="text" name="fullname" value="{{ u.nama }}" class="form-input">
+                <textarea name="bio" rows="3" class="form-input">{{ u.bio }}</textarea>
+                <div class="modal-acts">
+                    <button type="button" onclick="document.getElementById('editModal').classList.remove('active')">Batal</button>
+                    <button type="submit" class="btn-heritage">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% elif p == 'notif' %}
+    <h2>{{ t.notif }}</h2>
+    <div class="card">
+        {% for n in notifs %}
+        <div class="notif-item {{ 'read' if n.is_read else '' }}">
+            <i class="fa-solid fa-envelope-open-text gold-icon"></i>
+            <span>{{ n.message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

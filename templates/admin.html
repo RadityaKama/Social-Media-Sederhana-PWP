@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Kantor Gubernur</h1>
+
+<div class="admin-stats">
+    <div class="stat-card wood">
+        <h3>Total Penduduk</h3>
+        <p>{{ users|length }}</p>
+    </div>
+    <div class="stat-card green">
+        <h3>Total Arsip</h3>
+        <p>{{ posts|length }}</p>
+    </div>
+</div>
+
+<div class="admin-panel-grid">
+    <div class="card">
+        <h3><i class="fa-solid fa-bullhorn"></i> Publikasi Warta Kota</h3>
+        <form id="newsForm">
+            <input type="hidden" name="is_news" value="1">
+            <label>Judul Utama</label>
+            <input type="text" name="caption" class="form-input" required>
+            <label>Tautan Artikel (Link)</label>
+            <input type="url" name="link_url" class="form-input" required>
+            <button type="submit" class="btn-heritage full">Terbitkan Maklumat</button>
+        </form>
+
+        <h3 style="margin-top:30px"><i class="fa-solid fa-fire"></i> Rekayasa Tren</h3>
+        <form id="trendForm">
+            <input type="text" id="trendTag" class="form-input" placeholder="Topik (tanpa #)">
+            <button type="button" onclick="doAct('trend', 0)" class="btn-heritage inv full">Tambahkan Topik</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Sensus Penduduk</h3>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Nama</th><th>Peran</th><th>Email</th></tr>
+                {% for usr in users %}
+                <tr>
+                    <td><b>{{ usr.username }}</b></td>
+                    <td><span class="badge {{ usr.role }}">{{ usr.role }}</span></td>
+                    <td>{{ usr.email }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATAVIA | Heritage Network</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body data-uid="{{ session.get('id', '') }}">
+    {% block full_body %}
+    {% if session.loggedin %}
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand"><i class="fa-solid fa-landmark"></i> BATAVIA</div>
+            <nav>
+                <a href="/feed" class="nav-item {{ 'active' if p=='home' else '' }}"><i class="fa-solid fa-newspaper"></i> {{ t.home }}</a>
+                <a href="/explore" class="nav-item {{ 'active' if p=='explore' else '' }}"><i class="fa-solid fa-compass"></i> {{ t.explore }}</a>
+                <a href="/messages" class="nav-item {{ 'active' if 'messages' in request.path else '' }}"><i class="fa-solid fa-envelope"></i> {{ t.messages }}</a>
+                <a href="/notifications" class="nav-item {{ 'active' if p=='notif' else '' }}"><i class="fa-solid fa-bell"></i> {{ t.notif }}</a>
+                <a href="/profile/{{ u.id_user }}" class="nav-item {{ 'active' if p=='profile' else '' }}"><i class="fa-solid fa-user-circle"></i> {{ t.profile }}</a>
+                {% if u.role == 'admin' %}
+                <a href="/admin" class="nav-item"><i class="fa-solid fa-gavel"></i> {{ t.admin }}</a>
+                {% endif %}
+            </nav>
+            <div class="user-strip">
+                <div class="avatar av-sm" style="background-image: url('https://ui-avatars.com/api/?name={{ u.nama }}&background=B8860B&color=fff');"></div>
+                <div>
+                    <div style="font-weight: bold;">{{ u.nama }}</div>
+                    <a href="/logout" style="font-size: 0.8rem; color: #888;">{{ t.logout }}</a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <aside class="right-panel">
+            <h3>Topik Hangat</h3>
+            {% for tr in trends %}
+            <div class="trend-item">
+                <span class="trend-hash">#{{ tr.tag_name }}</span>
+            </div>
+            {% endfor %}
+
+            <h3 style="margin-top: 30px;">Warga Batavia</h3>
+            {% for s in sugg %}
+            <div class="sugg-item">
+                <a href="/profile/{{ s.id_user }}" style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                    <div class="avatar av-sm" style="background-image: url('https://ui-avatars.com/api/?name={{ s.nama }}&background=random');"></div>
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.9rem;">{{ s.username }}</div>
+                        <small>Citizen</small>
+                    </div>
+                </a>
+                <button onclick="doAct('follow', '{{ s.id_user }}')" class="btn-sugg">{{ t.follow }}</button>
+            </div>
+            {% endfor %}
+        </aside>
+    </div>
+    {% endif %}
+    {% endblock %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

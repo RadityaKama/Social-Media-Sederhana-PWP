@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block full_body %}
+<div class="auth-bg">
+    <div class="auth-card">
+        <h1>BATAVIA</h1>
+        <p>Heritage Social Network</p>
+        <form id="loginForm">
+            <input type="hidden" name="action" value="login">
+            <input type="text" name="username" class="form-input" placeholder="Nama Pengguna" required>
+            <input type="password" name="password" class="form-input" placeholder="Kata Sandi" required>
+            <button type="submit" class="btn-heritage full">MASUK</button>
+        </form>
+        <form id="regForm" style="display: none;">
+            <input type="hidden" name="action" value="register">
+            <input type="text" name="username" class="form-input" placeholder="Username" required>
+            <input type="text" name="fullname" class="form-input" placeholder="Nama Lengkap" required>
+            <input type="email" name="email" class="form-input" placeholder="Email" required>
+            <input type="password" name="password" class="form-input" placeholder="Sandi" required>
+            <select name="role" class="form-input">
+                <option value="user">Warga Sipil</option>
+                <option value="admin">Pejabat (Admin)</option>
+            </select>
+            <button type="submit" class="btn-heritage full">DAFTAR</button>
+        </form>
+        <div class="switch-link" onclick="toggleForms()">
+            <span id="switchText">Belum punya paspor? Daftar disini.</span>
+        </div>
+    </div>
+</div>
+<script>
+    function toggleForms() {
+        const l = document.getElementById('loginForm');
+        const r = document.getElementById('regForm');
+        const t = document.getElementById('switchText');
+        if(l.style.display === 'none') {
+            l.style.display = 'block'; r.style.display = 'none';
+            t.innerText = 'Belum punya paspor? Daftar disini.';
+        } else {
+            l.style.display = 'none'; r.style.display = 'block';
+            t.innerText = 'Sudah punya akun? Masuk disini.';
+        }
+    }
+</script>
+{% endblock %}
