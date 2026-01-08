@@ -3,12 +3,12 @@
 
 {% if p == 'home' %}
     <div class="card">
-        <form id="postForm" style="display: flex; gap: 15px">
+        <form id="postForm" style="display: flex; gap: 15px;">
             <div class="avatar av-md" style="background-image: url('https://ui-avatars.com/api/?name={{ u.nama }}&background=B8860B&color=fff');"></div>
             <div style="flex: 1;">
                 <textarea name="caption" rows="2" placeholder="{{ t.post_ph }}" class="clean-area"></textarea>
                 <div class="form-tools">
-                    <label for="fIn"><i class="fa-regular fa-image"></i> Photo</label>
+                    <label for="fIn"><i class="fa-regular fa-image"></i> Media</label>
                     <input type="file" id="fIn" name="file" hidden>
                     <button type="submit" class="btn-heritage">{{ t.post_btn }}</button>
                 </div>
@@ -17,41 +17,56 @@
     </div>
 
     {% for post in posts %}
-    <div class="card">
-        <div class="post-head">
-            <a href="/profile/{{ post.id_user }}" class="avatar av-sm" style="background-image: url('https://ui-avatars.com/api/?name={{ post.nama }}&background=random');"></a>
-            <div>
-                <a href="/profile/{{ post.id_user }}" style="font-weight: bold;">{{ post.username }} {% if post.role=='admin' %}<i class="fa-solid fa-certificate gold-icon"></i>{% endif %}</a>
-                <small style="display: block;">{{ post.created_at }}</small>
+        {% if post.is_news %}
+        <div class="news-card big" onclick="window.open('{{ post.news_link }}', '_blank')" style="margin-bottom: 25px;">
+            <div class="news-thumb" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) if post.file else '' }}'); height: 300px;"></div>
+            <div class="news-content">
+                <div class="news-tag">RESMI</div>
+                <h3>{{ post.news_title }}</h3>
+                <small>Baca Selengkapnya &rarr;</small>
             </div>
         </div>
-        <p class="post-body">{{ post.caption }}</p>
-        {% if post.file %}<div class="post-img" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) }}');"></div>{% endif %}
-        <div class="post-acts">
-            <i onclick="doAct('like', {{ post.id_postingan | tojson }})" class="{% if post.is_liked %}fa-solid liked{% else %}fa-regular{% endif %} fa-heart"></i>
-            <span>{{ post.likes }}</span>
+        {% else %}
+        <div class="card">
+            <div class="post-head">
+                <a href="/profile/{{ post.id_user }}" class="avatar av-sm" style="background-image: url('https://ui-avatars.com/api/?name={{ post.nama }}&background=random');"></a>
+                <div>
+                    <a href="/profile/{{ post.id_user }}" style="font-weight: bold;">{{ post.username }} {% if post.role=='admin' %}<i class="fa-solid fa-certificate gold-icon"></i>{% endif %}</a>
+                    <small style="display: block;">{{ post.created_at }}</small>
+                </div>
+            </div>
+            <p class="post-body">{{ post.display_caption }}</p>
+            {% if post.file %}
+            <div class="post-img" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) }}');" onclick="openLightbox(this.style.backgroundImage)"></div>
+            {% endif %}
+            <div class="post-acts">
+                <div onclick="doLike({{ post.id_postingan }}, this)">
+                    <i class="{{ 'fa-solid' if post.is_liked else 'fa-regular' }} fa-heart {{ 'liked' if post.is_liked else '' }}"></i>
+                    <span class="like-count">{{ post.likes }}</span>
+                </div>
+                <div onclick="openComments({{ post.id_postingan }})">
+                    <i class="fa-regular fa-comment"></i>
+                    <span>{{ post.comment_count }}</span>
+                </div>
+            </div>
         </div>
-    </div>
+        {% endif %}
     {% endfor %}
 
 {% elif p == 'explore' %}
     <h2>{{ t.news }}</h2>
-    <div class="news-ticker">
+    <div class="news-grid">
         {% for n in news %}
-        <div class="news-card" onclick="window.open('{{ n.file }}', '_blank')">
-            <div class="news-tag">RESMI</div>
-            <h3>{{ n.caption }}</h3>
-            <small>Baca Selengkapnya &rarr;</small>
+        <div class="news-card big" onclick="window.open('{{ n.news_link }}', '_blank')">
+            <div class="news-thumb" style="background-image: url('{{ url_for('static', filename='uploads/'+n.file) if n.file else '' }}');"></div>
+            <div class="news-content">
+                <div class="news-tag">RESMI</div>
+                <h3>{{ n.news_title }}</h3>
+                <small>Baca Selengkapnya &rarr;</small>
+            </div>
         </div>
-        {% endfor %}
-    </div>
-
-    <h2>Galeri Batavia</h2>
-    <div class="grid-gallery">
-        {% for post in posts %}
-        <a href="/profile/{{ post.id_user }}" class="grid-item" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) if post.file else '' }}');">
-            {% if not post.file %}<div class="txt-only">{{ post.caption }}</div>{% endif %}
-        </a>
+        {% else %}
+        <p style="text-align:center; color:#999; width:100%;">Belum ada berita.</p>
         {% endfor %}
     </div>
 
@@ -78,11 +93,31 @@
         {% endif %}
     </div>
 
-    <div class="grid-gallery">
-        {% for post in posts %}
-        <div class="grid-item" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) if post.file else '' }}');"></div>
-        {% endfor %}
+    {% for post in posts %}
+    <div class="card">
+        <div class="post-head">
+            <div class="avatar av-sm" style="background-image: url('https://ui-avatars.com/api/?name={{ target.nama }}&background=random');"></div>
+            <div>
+                <a href="#" style="font-weight: bold;">{{ target.username }}</a>
+                <small style="display: block;">{{ post.created_at }}</small>
+            </div>
+        </div>
+        <p class="post-body">{{ post.display_caption }}</p>
+        {% if post.file %}
+        <div class="post-img" style="background-image: url('{{ url_for('static', filename='uploads/'+post.file) }}');" onclick="openLightbox(this.style.backgroundImage)"></div>
+        {% endif %}
+        <div class="post-acts">
+            <div onclick="doLike({{ post.id_postingan }}, this)">
+                <i class="{{ 'fa-solid' if post.likes > 0 else 'fa-regular' }} fa-heart"></i>
+                <span class="like-count">{{ post.likes }}</span>
+            </div>
+            <div onclick="openComments({{ post.id_postingan }})">
+                <i class="fa-regular fa-comment"></i>
+                <span>{{ post.comment_count }}</span>
+            </div>
+        </div>
     </div>
+    {% endfor %}
 
     <div id="editModal" class="modal">
         <div class="modal-box">
@@ -109,4 +144,22 @@
         {% endfor %}
     </div>
 {% endif %}
+
+<div id="lightbox" class="lightbox" onclick="this.classList.remove('active')">
+    <div class="lightbox-content"></div>
+</div>
+
+<div id="commentModal" class="modal">
+    <div class="modal-box" style="height: 600px; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <h3>{{ t.comments }}</h3>
+            <button onclick="document.getElementById('commentModal').classList.remove('active')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <div id="commentList" style="flex: 1; overflow-y: auto; padding: 15px 0;"></div>
+        <div style="border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 10px;">
+            <input type="text" id="commentInput" class="form-input" placeholder="Tulis..." style="margin: 0;">
+            <button id="sendCommentBtn" class="btn-heritage">Kirim</button>
+        </div>
+    </div>
+</div>
 {% endblock %}

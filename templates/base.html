@@ -56,7 +56,7 @@
                         <small>Citizen</small>
                     </div>
                 </a>
-                <button onclick="doAct('follow', '{{ s.id_user }}')" class="btn-sugg">{{ t.follow }}</button>
+                <button onclick="doAct('follow', {{ s.id_user }})" class="btn-sugg">{{ t.follow }}</button>
             </div>
             {% endfor %}
         </aside>

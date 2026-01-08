@@ -31,6 +31,9 @@
         <div id="msgBox" class="msg-canvas" data-room="{{ [u.id_user, rcv.id_user]|sort|join('_') }}">
             {% for m in msgs %}
             <div class="msg-row {{ 'row-me' if m.sender_id == u.id_user else 'row-you' }}">
+                {% if m.sender_id != u.id_user %}
+                <div class="avatar av-sm" style="width:30px;height:30px;margin-right:10px;background-image: url('https://ui-avatars.com/api/?name={{ rcv.nama }}&background=random');"></div>
+                {% endif %}
                 <div class="msg-bubble {{ 'bubble-me' if m.sender_id == u.id_user else 'bubble-you' }}">
                     {{ m.message }}
                 </div>
@@ -48,9 +51,7 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <div class="empty-icon">
-                <i class="fa-solid fa-feather-pointed"></i>
-            </div>
+            <div class="empty-icon"><i class="fa-solid fa-feather-pointed"></i></div>
             <h2>Korespondensi Batavia</h2>
             <p>Pilih warga dari daftar kontak untuk memulai percakapan.</p>
         </div>
